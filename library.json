@@ -1,0 +1,20 @@
+{
+  "books": [
+    {
+      "id": "demo",
+      "title": "範例小說",
+      "author": "作者名稱",
+      "blurb": "這是一本示範用的書。換成你自己的小說就能使用。",
+      "chapters": [
+        {
+          "title": "第一章　粉紫色的黃昏",
+          "file": "books/demo/01.txt"
+        },
+        {
+          "title": "第二章　粉綠色的清晨",
+          "file": "books/demo/02.txt"
+        }
+      ]
+    }
+  ]
+}
