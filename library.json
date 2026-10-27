@@ -1,19 +1,13 @@
 {
   "books": [
     {
-      "id": "demo",
-      "title": "範例小說",
+      "id": "mari-go-round",
+      "title": "MaRi Go Round",
       "author": "作者名稱",
-      "blurb": "這是一本示範用的書。換成你自己的小說就能使用。",
+      "blurb": "一句話簡介寫在這裡。",
       "chapters": [
-        {
-          "title": "第一章　粉紫色的黃昏",
-          "file": "books/demo/01.txt"
-        },
-        {
-          "title": "第二章　粉綠色的清晨",
-          "file": "books/demo/02.txt"
-        }
+        { "title": "第一章　章節標題", "file": "books/MaRi Go ARound/chapter1.txt" },
+        { "title": "第二章　章節標題", "file": "books/MaRi Go ARound/chapter2.txt" }
       ]
     }
   ]
