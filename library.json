@@ -3,11 +3,10 @@
     {
       "id": "mari-go-around",
       "title": "MaRi Go ARound",
-      "author": "作者名稱",
-      "blurb": "一句話簡介寫在這裡。",
+      "blurb": "MaRi醬超級辣的捏～。",
       "chapters": [
-        { "title": "第一章　章節標題", "file": "books/MaRi Go ARound/chapter1.txt" },
-        { "title": "第二章　章節標題", "file": "books/MaRi Go ARound/chapter2.txt" }
+        { "title": "Chapter 1", "file": "books/MaRi Go ARound/chapter1.txt" },
+        { "title": "Chapter 2", "file": "books/MaRi Go ARound/chapter2.txt" }
       ]
     }
   ]
