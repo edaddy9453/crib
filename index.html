@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crib By EDaddy</title>
+<title>小說書房</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
@@ -40,8 +40,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* 閱讀 */
 #reader{height:100dvh;display:flex;flex-direction:column;padding:12px 12px 0}
-.bar{display:flex;align-items:center;gap:8px;max-width:760px;width:100%;margin:0 auto 8px}
-.bar .title{flex:1;text-align:center;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:760px;width:100%;margin:0 auto 8px}
+.bar .title{flex:1 1 80px;text-align:center;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:.85rem}
 .stage{flex:1;min-height:0;max-width:760px;width:100%;margin:0 auto;position:relative;perspective:1400px}
 .sheet{height:100%;background:var(--paper);border:1px solid var(--line);border-radius:10px 20px 20px 10px;
@@ -57,9 +57,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 .foot .track{flex:1;height:6px;border-radius:6px;background:var(--line);overflow:hidden}
 .foot .fill{height:100%;width:0;background:var(--sage);transition:width .3s}
 .foot button{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px}
-#toc{position:fixed;inset:0;background:rgba(60,40,80,.35);z-index:20;display:grid;place-items:center}
-#toc .box{background:var(--paper);border-radius:16px;padding:22px;width:min(420px,90vw);max-height:80vh;overflow:auto}
-#toc button.ch{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 4px}
+#toc,#bmPanel{position:fixed;inset:0;background:rgba(60,40,80,.35);z-index:20;display:grid;place-items:center}
+#toc .box,#bmPanel .box{background:var(--paper);border-radius:16px;padding:22px;width:min(420px,90vw);max-height:80vh;overflow:auto}
+#toc button.ch,#bmPanel button.ch{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 4px}
+
+/* 章節選取頁 */
+#chapters{max-width:760px;margin:0 auto;padding:36px 20px 160px}
+#chapters h1{font-size:1.7rem;margin:14px 0 4px;letter-spacing:.08em}
+#chapters .by{color:var(--soft);margin:0 0 18px}
+.chlist{margin-top:18px}
+.chlist button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.chlist button:hover{border-color:var(--sage)}
+.chlist small{color:var(--soft);white-space:nowrap}
+#ytLink{display:inline-flex;align-items:center;padding:0 4px}
 
 /* 音樂播放器 */
 #music{position:fixed;right:12px;bottom:12px;z-index:10;width:230px;background:var(--paper);
@@ -78,16 +88,27 @@ button{font:inherit;color:inherit;cursor:pointer}
 <body>
 
 <main id="library">
-  <h1>Crib By EDaddy</h1>
-  <p class="sub">點你想看的，點兩側或用方向鍵翻頁。</p>
+  <h1>小說書房</h1>
+  <p class="sub">選一本書，點兩側或用方向鍵翻頁。</p>
+  <button class="chip" id="bmLib" style="margin-bottom:24px">我的書籤</button>
   <div class="shelf" id="shelf"></div>
 </main>
 
+<section id="chapters" hidden>
+  <button class="chip" id="chBack">← 書庫</button>
+  <h1 id="chTitle"></h1>
+  <p class="by" id="chBy"></p>
+  <button class="chip" id="chCont">開始閱讀</button>
+  <div class="chlist" id="chList"></div>
+</section>
+
 <section id="reader" hidden>
   <div class="bar">
-    <button class="chip" id="back">書庫</button>
+    <button class="chip" id="back">← 章節</button>
     <div class="title" id="rtitle"></div>
     <button class="chip" id="tocBtn">目錄</button>
+    <button class="chip" id="bmAdd">☆ 加書籤</button>
+    <button class="chip" id="bmList">書籤</button>
     <button class="chip" id="fsDown" aria-label="縮小字體">A−</button>
     <button class="chip" id="fsUp" aria-label="放大字體">A+</button>
   </div>
@@ -101,6 +122,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <div id="toc" hidden><div class="box"><div id="tocList"></div><p><button class="chip" id="tocClose">關閉</button></p></div></div>
 
+<div id="bmPanel" hidden><div class="box"><b>我的書籤</b><div id="bmListBox"></div><p><button class="chip" id="bmClose">關閉</button></p></div></div>
+
 <aside id="music" aria-label="音樂播放器">
   <div id="ytbox"><div id="yt"></div></div>
   <div class="row">
@@ -110,6 +133,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="row">
     <button id="ytToggle">暫停／繼續</button>
     <button id="ytSize">縮小</button>
+    <a id="ytLink" href="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=JOk0rAruGAYjM8FV" target="_blank" rel="noopener" aria-label="在 YouTube Music 開啟播放清單" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
   </div>
 </aside>
 
@@ -127,7 +151,7 @@ const store = {
 let book=null, ch=0, page=0, pages=1, GAP=60, fs=store.get('fs',1.1);
 
 function showLibrary(){
-  $('reader').hidden=true; $('library').hidden=false; history.replaceState(null,'','#');
+  $('reader').hidden=true; $('chapters').hidden=true; $('library').hidden=false; history.replaceState(null,'','#');
 }
 function buildShelf(){
   $('shelf').innerHTML='';
@@ -143,11 +167,33 @@ function buildShelf(){
 }
 function openBook(id, c, p){
   book=BOOKS.find(b=>b.id===id); if(!book) return showLibrary();
-  const saved=store.get('pos-'+id,{ch:0,page:0});
-  ch = c ?? saved.ch; page = p ?? saved.page;
-  $('library').hidden=true; $('reader').hidden=false;
+  if(c===undefined) return showChapters();
+  readAt(c,p,null);
+}
+function showChapters(){
+  $('library').hidden=true; $('reader').hidden=true; $('chapters').hidden=false;
+  history.replaceState(null,'','#'+book.id);
+  $('chTitle').textContent=book.title;
+  $('chBy').textContent=book.author+(book.blurb?'　'+book.blurb:'');
+  const saved=store.get('pos-'+book.id,null);
+  $('chCont').textContent=saved?`繼續閱讀（第 ${saved.ch+1} 章）`:'開始閱讀';
+  $('chCont').onclick=()=>saved?readAt(saved.ch,saved.page,saved.r):readAt(0,0,null);
+  const list=$('chList'); list.innerHTML='';
+  const all=bms();
+  book.chapters.forEach((c,i)=>{
+    const b=document.createElement('button'), t=document.createElement('span');
+    t.textContent=c.title; b.appendChild(t);
+    const n=all.filter(m=>m.b===book.id&&m.c===i).length;
+    if(n){ const sm=document.createElement('small'); sm.textContent='🔖 '+n; b.appendChild(sm); }
+    b.onclick=()=>readAt(i,0,null);
+    list.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+function readAt(c,p,r){
+  ch=c; $('chapters').hidden=true; $('library').hidden=true; $('reader').hidden=false;
   $('rtitle').textContent=book.title;
-  renderChapter(page);
+  renderChapter(p||0,r);
 }
 async function getText(c){
   if(!(c.file in cache)){
@@ -157,7 +203,7 @@ async function getText(c){
   }
   return cache[c.file];
 }
-async function renderChapter(goPage=0){
+async function renderChapter(goPage=0,ratio=null){
   const c=book.chapters[ch];
   let text;
   try{ text=await getText(c); }
@@ -166,9 +212,9 @@ async function renderChapter(goPage=0){
   const inner=$('inner'); inner.innerHTML='';
   const h=document.createElement('h2'); h.textContent=c.title; inner.appendChild(h);
   paras.forEach(t=>{const p=document.createElement('p'); p.textContent=t; inner.appendChild(p);});
-  layout(goPage);
+  layout(goPage,ratio);
 }
-function layout(goPage=0){
+function layout(goPage=0,ratio=null){
   const v=$('view'), inner=$('inner');
   inner.style.setProperty('--fs', fs+'rem');
   const W=v.clientWidth, H=v.clientHeight;
@@ -176,7 +222,7 @@ function layout(goPage=0){
   inner.style.width=W+'px'; inner.style.height=H+'px';
   inner.style.columnWidth=W+'px'; inner.style.columnGap=GAP+'px';
   pages=Math.max(1,Math.round((inner.scrollWidth+GAP)/(W+GAP)));
-  page = goPage===-1 ? pages-1 : Math.min(goPage,pages-1);
+  page = ratio!=null ? Math.min(pages-1,Math.floor(ratio*pages)) : goPage===-1 ? pages-1 : Math.min(goPage,pages-1);
   show();
 }
 function show(){
@@ -185,7 +231,8 @@ function show(){
   const total=book.chapters.length;
   $('pg').textContent=`第 ${ch+1}／${total} 章　${page+1}／${pages} 頁`;
   $('fill').style.width=(((ch+(page+1)/pages)/total)*100)+'%';
-  store.set('pos-'+book.id,{ch,page});
+  store.set('pos-'+book.id,{ch,page,r:page/pages});
+  $('bmAdd').textContent=bmIndex()>=0?'★ 已加書籤':'☆ 加書籤';
   history.replaceState(null,'',`#${book.id}/${ch}/${page}`);
 }
 function turn(dir){
@@ -215,14 +262,14 @@ function openToc(){
 }
 
 $('prev').onclick=()=>turn(-1); $('next').onclick=()=>turn(1);
-$('back').onclick=showLibrary; $('tocBtn').onclick=openToc; $('tocClose').onclick=()=>$('toc').hidden=true;
-$('fsUp').onclick=()=>{fs=Math.min(1.6,fs+.1);store.set('fs',fs);layout(0);};
-$('fsDown').onclick=()=>{fs=Math.max(.9,fs-.1);store.set('fs',fs);layout(0);};
+$('back').onclick=showChapters; $('chBack').onclick=showLibrary; $('tocBtn').onclick=openToc; $('tocClose').onclick=()=>$('toc').hidden=true;
+$('fsUp').onclick=()=>{fs=Math.min(1.6,fs+.1);store.set('fs',fs);layout(0,page/pages);};
+$('fsDown').onclick=()=>{fs=Math.max(.9,fs-.1);store.set('fs',fs);layout(0,page/pages);};
 document.addEventListener('keydown',e=>{
   if($('reader').hidden||e.target.tagName==='INPUT') return;
   if(e.key==='ArrowRight'||e.key===' ') {e.preventDefault();turn(1);}
   if(e.key==='ArrowLeft') turn(-1);
-  if(e.key==='Escape') $('toc').hidden=true;
+  if(e.key==='Escape'){ $('toc').hidden=true; $('bmPanel').hidden=true; }
 });
 let sx=null;
 $('sheet').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
@@ -230,9 +277,38 @@ $('sheet').addEventListener('touchend',e=>{
   if(sx===null) return; const dx=e.changedTouches[0].clientX-sx; sx=null;
   if(Math.abs(dx)>50) turn(dx<0?1:-1);
 });
-let rt; addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('reader').hidden) layout(0);},200);});
+let rt; addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('reader').hidden) layout(0,page/pages);},200);});
+
+/* ============ 書籤 ============ */
+const bms=()=>store.get('bm',[]);
+const bmIndex=()=>bms().findIndex(m=>m.b===book.id&&m.c===ch&&Math.floor(m.r*pages)===page);
+function toggleBm(){
+  const a=bms(), i=bmIndex();
+  if(i>=0) a.splice(i,1); else a.push({b:book.id,c:ch,p:page+1,r:page/pages,t:Date.now()});
+  store.set('bm',a); show();
+}
+function openBm(){
+  const box=$('bmListBox'); box.innerHTML='';
+  const a=bms().slice().sort((x,y)=>y.t-x.t);
+  if(!a.length){ const p=document.createElement('p'); p.textContent='還沒有書籤。閱讀時按「加書籤」，就能收藏目前這一頁。'; box.appendChild(p); }
+  a.forEach(m=>{
+    const bk=BOOKS.find(x=>x.id===m.b); if(!bk||!bk.chapters[m.c]) return;
+    const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:6px';
+    const g=document.createElement('button'); g.className='ch'; g.style.flex='1';
+    g.textContent=`${bk.title}・${bk.chapters[m.c].title}・第 ${m.p} 頁`;
+    g.onclick=()=>{ $('bmPanel').hidden=true; book=bk; readAt(m.c,0,m.r); };
+    const x=document.createElement('button'); x.className='chip'; x.textContent='✕'; x.setAttribute('aria-label','刪除書籤');
+    x.onclick=()=>{ store.set('bm',bms().filter(y=>y.t!==m.t)); openBm(); if(!$('reader').hidden) show(); };
+    row.append(g,x); box.appendChild(row);
+  });
+  $('bmPanel').hidden=false;
+}
+$('bmAdd').onclick=toggleBm; $('bmList').onclick=openBm; $('bmLib').onclick=openBm;
+$('bmClose').onclick=()=>$('bmPanel').hidden=true;
 
 /* ============ YouTube 音樂播放器（翻頁時不會中斷） ============ */
+const DEFAULT_YT='https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=JOk0rAruGAYjM8FV';
+function ytHref(src){ return src.list?'https://music.youtube.com/playlist?list='+encodeURIComponent(src.list):'https://music.youtube.com/watch?v='+encodeURIComponent(src.id); }
 let player=null, ytReady=false, pending=null;
 function parseYT(u){
   try{
@@ -253,14 +329,14 @@ function startPlayer(src){
   if(!ytReady){ pending=src; loadYTApi(); return; }
   if(player && player.destroy){ player.destroy(); $('ytbox').innerHTML='<div id="yt"></div>'; }
   const vars={playsinline:1,rel:0};
-  const cfg={width:'100%',height:'100%',playerVars:vars};
+  const cfg={width:'100%',height:'100%',playerVars:vars,events:{onReady:e=>{ if(src.list){ try{ e.target.setShuffle(true); e.target.setLoop(true); }catch(_){} } }}};
   if(src.list){ vars.listType='playlist'; vars.list=src.list; } else { cfg.videoId=src.id; }
   player=new YT.Player('yt',cfg);
 }
 $('ytGo').onclick=()=>{
   const src=parseYT($('ytUrl').value);
   if(!src){ $('ytUrl').value=''; $('ytUrl').placeholder='網址格式不正確，請重新貼上'; return; }
-  store.set('yt',$('ytUrl').value);
+  store.set('yt',$('ytUrl').value); $('ytLink').href=ytHref(src);
   startPlayer(src);
   setTimeout(()=>{ try{player.playVideo();}catch(e){} },1200);
 };
@@ -275,7 +351,9 @@ $('ytSize').onclick=()=>{
 
 /* ============ 啟動 ============ */
 const savedYT=store.get('yt','');
-if(savedYT){ $('ytUrl').value=savedYT; const s=parseYT(savedYT); if(s){ loadYTApi(); pending=s; } }
+if(savedYT) $('ytUrl').value=savedYT;
+const startSrc=parseYT(savedYT)||parseYT(DEFAULT_YT);
+if(startSrc){ $('ytLink').href=ytHref(startSrc); loadYTApi(); pending=startSrc; }
 (async()=>{
   try{
     const r=await fetch('library.json');
