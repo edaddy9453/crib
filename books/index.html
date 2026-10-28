@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crib By EDaddy</title>
+<style>
+:root{
+  --lav:#e9dcf5; --pink:#f8dfec; --mint:#d3ecdf; --sage:#86b9a0;
+  --ink:#4b3d5e; --soft:#7d6e91; --paper:#fffafd; --line:#e4d3ee;
+  --bg: linear-gradient(160deg,var(--pink) 0%,var(--lav) 55%,var(--mint) 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --lav:#3a3050; --pink:#47304a; --mint:#2c4440; --sage:#8fc5aa;
+    --ink:#f0e6f7; --soft:#bfb0d0; --paper:#2b2438; --line:#4d4062; }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);background-attachment:fixed;color:var(--ink);
+  font-family:"Microsoft JhengHei","微軟正黑體","PingFang TC","Noto Sans TC",sans-serif;line-height:1.9}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* 書庫 */
+#library{max-width:880px;margin:0 auto;padding:48px 20px 160px}
+#library h1{font-size:2rem;margin:0 0 6px;letter-spacing:.12em}
+#library .sub{color:var(--soft);margin:0 0 32px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
+.book{background:var(--paper);border:1px solid var(--line);border-radius:6px 18px 18px 6px;
+  padding:22px 20px 20px 26px;text-align:left;position:relative;
+  box-shadow:-6px 0 0 var(--sage) inset, 0 8px 22px rgba(120,90,150,.14);transition:transform .2s}
+.book:hover{transform:translateY(-4px)}
+.book h2{font-size:1.15rem;margin:0 0 4px}
+.book .by{color:var(--soft);font-size:.85rem;margin:0 0 10px}
+.book p{margin:0;font-size:.9rem;line-height:1.7}
+
+/* 閱讀 */
+#reader{height:100dvh;display:flex;flex-direction:column;padding:12px 12px 34px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:760px;width:100%;margin:0 auto 8px}
+.bar .title{flex:1 1 80px;text-align:center;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:.85rem}
+.stage{flex:1;min-height:0;max-width:760px;width:100%;margin:0 auto;position:relative;perspective:1400px}
+.sheet{height:100%;background:var(--paper);border:1px solid var(--line);border-radius:10px 20px 20px 10px;
+  padding:30px 34px;box-shadow:-10px 0 0 var(--lav) inset, 0 14px 40px rgba(120,90,150,.2);
+  transform-origin:left center}
+.view{height:100%;overflow:hidden;position:relative}
+.inner{font-size:var(--fs,1.1rem);text-align:justify;column-fill:auto;transition:none}
+.inner h2{font-size:1.4em;margin:0 0 1em;break-after:avoid;letter-spacing:.06em}
+.inner p{margin:0 0 1em;text-indent:2em}
+.edge{position:absolute;top:0;bottom:0;width:22%;background:none;border:0;z-index:2}
+.edge.l{left:0}.edge.r{right:0}
+.foot{max-width:760px;width:100%;margin:8px auto;display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--soft)}
+.foot input{flex:1;min-width:0;accent-color:var(--sage);cursor:pointer}
+.foot button{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px}
+#toc,#bmPanel{position:fixed;inset:0;background:rgba(60,40,80,.35);z-index:20;display:grid;place-items:center}
+#toc .box,#bmPanel .box{background:var(--paper);border-radius:16px;padding:22px;width:min(420px,90vw);max-height:80vh;overflow:auto}
+#toc button.ch,#bmPanel button.ch{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 4px}
+
+/* 章節選取頁 */
+#chapters{max-width:760px;margin:0 auto;padding:36px 20px 160px}
+#chapters h1,#gallery h1{font-size:1.7rem;margin:14px 0 4px;letter-spacing:.08em}
+#chapters .by,#gallery .by{color:var(--soft);margin:0 0 18px}
+.chlist{margin-top:18px}
+.chlist button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.chlist button:hover{border-color:var(--sage)}
+.chlist small{color:var(--soft);white-space:nowrap}
+#ytLink{display:inline-flex;align-items:center;padding:0 4px}
+
+/* 圖庫 */
+#gallery{max-width:880px;margin:0 auto;padding:36px 20px 160px}
+#gGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.gi{padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);aspect-ratio:3/4}
+.gi img{width:100%;height:100%;object-fit:cover;display:block}
+.book.gal{box-shadow:-6px 0 0 #e6a8c8 inset, 0 8px 22px rgba(120,90,150,.14)}
+#lb{position:fixed;inset:0;background:rgba(40,25,55,.88);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:82vh;border-radius:10px}
+#lb p{color:#fff;margin:8px 0 0}
+/* 瀏覽次數 */
+#counter{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px;font-size:.78rem;color:var(--soft);pointer-events:none}
+@media (max-width:600px){#counter{left:12px;transform:none}}
+
+/* 音樂播放器 */
+#music{position:fixed;right:12px;bottom:12px;z-index:10;width:230px;background:var(--paper);
+  border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 10px 30px rgba(120,90,150,.25);font-size:.8rem}
+#music.mini{width:150px}
+#ytbox{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--mint)}
+#ytbox iframe{width:100%;height:100%;display:block}
+#music .row{display:flex;gap:6px;margin-top:6px}
+#music input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:transparent;color:var(--ink);font:inherit}
+#music button{border:1px solid var(--line);background:var(--mint);border-radius:8px;padding:2px 10px;color:#2f4a3f}
+@media (prefers-color-scheme: dark){#music button{color:var(--ink)}}
+@media (max-width:600px){.sheet{padding:22px 20px}#music{width:170px}#music.mini{width:120px}}
+@media (prefers-reduced-motion: reduce){.book{transition:none}}
+</style>
+</head>
+<body>
+
+<main id="library">
+  <h1>Crib By EDaddy</h1>
+  <p class="sub">想看就按，點兩側或用方向鍵翻頁。</p>
+  <button class="chip" id="bmLib" style="margin-bottom:24px">書籤</button>
+  <div class="shelf" id="shelf"></div>
+</main>
+
+<section id="chapters" hidden>
+  <button class="chip" id="chBack">← 回去</button>
+  <h1 id="chTitle"></h1>
+  <p class="by" id="chBy"></p>
+  <button class="chip" id="chCont">開始閱讀</button>
+  <div class="chlist" id="chList"></div>
+</section>
+
+<section id="gallery" hidden>
+  <button class="chip" id="gBack">← 回去</button>
+  <h1 id="gTitle"></h1>
+  <p class="by" id="gBy"></p>
+  <div id="gGrid"></div>
+</section>
+
+<section id="reader" hidden>
+  <div class="bar">
+    <button class="chip" id="back">← 章節</button>
+    <div class="title" id="rtitle"></div>
+    <button class="chip" id="tocBtn">目錄</button>
+    <button class="chip" id="bmAdd">☆ 加書籤</button>
+    <button class="chip" id="bmList">書籤</button>
+    <button class="chip" id="fsDown" aria-label="縮小字體">A−</button>
+    <button class="chip" id="fsUp" aria-label="放大字體">A+</button>
+  </div>
+  <div class="stage">
+    <button class="edge l" id="prev" aria-label="上一頁"></button>
+    <button class="edge r" id="next" aria-label="下一頁"></button>
+    <div class="sheet" id="sheet"><div class="view" id="view"><div class="inner" id="inner"></div></div></div>
+  </div>
+  <div class="foot"><span id="pg"></span><input type="range" id="seek" min="0" max="0" value="0" aria-label="拖動跳到指定頁數"></div>
+</section>
+
+<div id="toc" hidden><div class="box"><div id="tocList"></div><p><button class="chip" id="tocClose">關閉</button></p></div></div>
+
+<div id="bmPanel" hidden><div class="box"><b>我的書籤</b><div id="bmListBox"></div><p><button class="chip" id="bmClose">關閉</button></p></div></div>
+
+<aside id="music" aria-label="音樂播放器">
+  <div id="ytbox"><div id="yt"></div></div>
+  <div class="row">
+    <input id="ytUrl" placeholder="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp" aria-label="YouTube 網址">
+    <button id="ytGo">播放</button>
+  </div>
+  <div class="row">
+    <button id="ytToggle">暫停／繼續</button>
+    <button id="ytSize">縮小</button>
+    <a id="ytLink" href="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp" target="_blank" rel="noopener" aria-label="在 YouTube Music 開啟播放清單" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
+  </div>
+  <div id="ytMsg" role="status" style="font-size:.74rem;color:var(--soft);margin-top:4px"></div>
+</aside>
+
+<div id="lb" hidden><img id="lbImg" alt=""><p id="lbCap"></p></div>
+<div id="counter" aria-live="polite">瀏覽次數 <b id="cnt">—</b></div>
+
+<script>
+/* 書籍資料從 library.json 讀取，章節文字從 books/ 資料夾讀取 */
+let BOOKS = [], GALS = [];
+const cache = {};
+
+/* ============ 閱讀器 ============ */
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v===null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let book=null, ch=0, page=0, pages=1, GAP=60, fs=store.get('fs',1.1);
+
+function showLibrary(){
+  $('reader').hidden=true; $('chapters').hidden=true; $('gallery').hidden=true; $('library').hidden=false; history.replaceState(null,'','#');
+}
+function buildShelf(){
+  $('shelf').innerHTML='';
+  BOOKS.forEach(b=>{
+    const el=document.createElement('button'); el.className='book';
+    el.innerHTML=`<h2></h2><div class="by"></div><p></p>`;
+    el.querySelector('h2').textContent=b.title;
+    el.querySelector('.by').textContent=b.author;
+    el.querySelector('p').textContent=b.blurb;
+    el.onclick=()=>openBook(b.id);
+    $('shelf').appendChild(el);
+  });
+  GALS.forEach(g=>{
+    const el=document.createElement('button'); el.className='book gal';
+    el.innerHTML=`<h2></h2><div class="by"></div><p></p>`;
+    el.querySelector('h2').textContent=g.title;
+    el.querySelector('.by').textContent='圖庫・'+(g.images||[]).length+' 張';
+    el.querySelector('p').textContent=g.blurb||'';
+    el.onclick=()=>openGallery(g.id);
+    $('shelf').appendChild(el);
+  });
+}
+function openBook(id, c, p){
+  book=BOOKS.find(b=>b.id===id); if(!book) return showLibrary();
+  if(c===undefined) return showChapters();
+  readAt(c,p,null);
+}
+function showChapters(){
+  $('library').hidden=true; $('reader').hidden=true; $('gallery').hidden=true; $('chapters').hidden=false;
+  history.replaceState(null,'','#'+book.id);
+  $('chTitle').textContent=book.title;
+  $('chBy').textContent=book.author+(book.blurb?'　'+book.blurb:'');
+  const saved=store.get('pos-'+book.id,null);
+  $('chCont').textContent=saved?`繼續閱讀（第 ${saved.ch+1} 章）`:'開始閱讀';
+  $('chCont').onclick=()=>saved?readAt(saved.ch,saved.page,saved.r):readAt(0,0,null);
+  const list=$('chList'); list.innerHTML='';
+  const all=bms();
+  book.chapters.forEach((c,i)=>{
+    const b=document.createElement('button'), t=document.createElement('span');
+    t.textContent=c.title; b.appendChild(t);
+    const n=all.filter(m=>m.b===book.id&&m.c===i).length;
+    if(n){ const sm=document.createElement('small'); sm.textContent='🔖 '+n; b.appendChild(sm); }
+    b.onclick=()=>readAt(i,0,null);
+    list.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+function readAt(c,p,r){
+  ch=c; $('chapters').hidden=true; $('library').hidden=true; $('gallery').hidden=true; $('reader').hidden=false;
+  $('rtitle').textContent=book.title;
+  renderChapter(p||0,r);
+}
+async function getText(c){
+  if(!(c.file in cache)){
+    const r=await fetch(c.file);
+    if(!r.ok) throw new Error(r.status);
+    cache[c.file]=await r.text();
+  }
+  return cache[c.file];
+}
+async function renderChapter(goPage=0,ratio=null){
+  const c=book.chapters[ch];
+  let text;
+  try{ text=await getText(c); }
+  catch(e){ text='找不到這一章的檔案。請確認 library.json 裡的檔名，和 books 資料夾裡的檔名完全一致。'; }
+  const paras=text.trim().split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  const inner=$('inner'); inner.innerHTML='';
+  const h=document.createElement('h2'); h.textContent=c.title; inner.appendChild(h);
+  paras.forEach(t=>{const p=document.createElement('p'); p.textContent=t; inner.appendChild(p);});
+  layout(goPage,ratio);
+}
+function layout(goPage=0,ratio=null){
+  const v=$('view'), inner=$('inner');
+  inner.style.setProperty('--fs', fs+'rem');
+  const W=v.clientWidth, H=v.clientHeight;
+  GAP = Math.round(W*0.12);
+  inner.style.width=W+'px'; inner.style.height=H+'px';
+  inner.style.columnWidth=W+'px'; inner.style.columnGap=GAP+'px';
+  pages=Math.max(1,Math.round((inner.scrollWidth+GAP)/(W+GAP)));
+  page = ratio!=null ? Math.min(pages-1,Math.floor(ratio*pages)) : goPage===-1 ? pages-1 : Math.min(goPage,pages-1);
+  show();
+}
+function show(){
+  const W=$('view').clientWidth;
+  $('inner').style.transform=`translateX(${-page*(W+GAP)}px)`;
+  const total=book.chapters.length;
+  $('pg').textContent=`第 ${ch+1}／${total} 章　${page+1}／${pages} 頁`;
+  $('seek').max=pages-1; $('seek').value=page;
+  store.set('pos-'+book.id,{ch,page,r:page/pages});
+  $('bmAdd').textContent=bmIndex()>=0?'★ 已加書籤':'☆ 加書籤';
+  history.replaceState(null,'',`#${book.id}/${ch}/${page}`);
+}
+function turn(dir){
+  let nextCh=ch, nextPage=page+dir;
+  if(nextPage>=pages){ if(ch>=book.chapters.length-1) return; nextCh=ch+1; nextPage=0; }
+  if(nextPage<0){ if(ch<=0) return; nextCh=ch-1; nextPage=-1; }
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const apply=()=>{ if(nextCh!==ch){ ch=nextCh; renderChapter(nextPage);} else { page=nextPage; show(); } };
+  if(reduce){ apply(); return; }
+  const sheet=$('sheet'), sign=dir>0?-1:1;
+  sheet.animate([
+    {transform:'rotateY(0)',opacity:1},
+    {transform:`rotateY(${sign*9}deg)`,opacity:.25,offset:.5},
+    {transform:'rotateY(0)',opacity:1}
+  ],{duration:340,easing:'ease-in-out'});
+  setTimeout(apply,165);
+}
+function openToc(){
+  const list=$('tocList'); list.innerHTML='';
+  book.chapters.forEach((c,i)=>{
+    const b=document.createElement('button'); b.className='ch'; b.textContent=c.title;
+    if(i===ch) b.style.fontWeight='600';
+    b.onclick=()=>{ch=i;$('toc').hidden=true;renderChapter(0);};
+    list.appendChild(b);
+  });
+  $('toc').hidden=false;
+}
+
+$('prev').onclick=()=>turn(-1); $('next').onclick=()=>turn(1);
+$('seek').oninput=e=>{page=+e.target.value;show();};
+$('back').onclick=showChapters; $('chBack').onclick=showLibrary; $('tocBtn').onclick=openToc; $('tocClose').onclick=()=>$('toc').hidden=true;
+$('fsUp').onclick=()=>{fs=Math.min(1.6,fs+.1);store.set('fs',fs);layout(0,page/pages);};
+$('fsDown').onclick=()=>{fs=Math.max(.9,fs-.1);store.set('fs',fs);layout(0,page/pages);};
+document.addEventListener('keydown',e=>{
+  if($('reader').hidden||e.target.tagName==='INPUT') return;
+  if(e.key==='ArrowRight'||e.key===' ') {e.preventDefault();turn(1);}
+  if(e.key==='ArrowLeft') turn(-1);
+  if(e.key==='Escape'){ $('toc').hidden=true; $('bmPanel').hidden=true; }
+});
+let sx=null;
+$('sheet').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+$('sheet').addEventListener('touchend',e=>{
+  if(sx===null) return; const dx=e.changedTouches[0].clientX-sx; sx=null;
+  if(Math.abs(dx)>50) turn(dx<0?1:-1);
+});
+let rt; addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('reader').hidden) layout(0,page/pages);},200);});
+
+/* ============ 書籤 ============ */
+const bms=()=>store.get('bm',[]);
+const bmIndex=()=>bms().findIndex(m=>m.b===book.id&&m.c===ch&&Math.floor(m.r*pages)===page);
+function toggleBm(){
+  const a=bms(), i=bmIndex();
+  if(i>=0) a.splice(i,1); else a.push({b:book.id,c:ch,p:page+1,r:page/pages,t:Date.now()});
+  store.set('bm',a); show();
+}
+function openBm(){
+  const box=$('bmListBox'); box.innerHTML='';
+  const a=bms().slice().sort((x,y)=>y.t-x.t);
+  if(!a.length){ const p=document.createElement('p'); p.textContent='還沒有書籤。閱讀時按「加書籤」，就能收藏目前這一頁。'; box.appendChild(p); }
+  a.forEach(m=>{
+    const bk=BOOKS.find(x=>x.id===m.b); if(!bk||!bk.chapters[m.c]) return;
+    const row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;gap:6px';
+    const g=document.createElement('button'); g.className='ch'; g.style.flex='1';
+    g.textContent=`${bk.title}・${bk.chapters[m.c].title}・第 ${m.p} 頁`;
+    g.onclick=()=>{ $('bmPanel').hidden=true; book=bk; readAt(m.c,0,m.r); };
+    const x=document.createElement('button'); x.className='chip'; x.textContent='✕'; x.setAttribute('aria-label','刪除書籤');
+    x.onclick=()=>{ store.set('bm',bms().filter(y=>y.t!==m.t)); openBm(); if(!$('reader').hidden) show(); };
+    row.append(g,x); box.appendChild(row);
+  });
+  $('bmPanel').hidden=false;
+}
+$('bmAdd').onclick=toggleBm; $('bmList').onclick=openBm; $('bmLib').onclick=openBm;
+$('bmClose').onclick=()=>$('bmPanel').hidden=true;
+
+/* ============ YouTube 音樂播放器（翻頁時不會中斷） ============ */
+const DEFAULT_YT='https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp';
+function ytHref(src){ return src.list?'https://music.youtube.com/playlist?list='+encodeURIComponent(src.list):'https://music.youtube.com/watch?v='+encodeURIComponent(src.id); }
+let player=null, ytReady=false, pending=null;
+function parseYT(u){
+  try{
+    const url=new URL(u.trim());
+    const list=url.searchParams.get('list');
+    if(list) return {list};
+    if(url.hostname.includes('youtu.be')) return {id:url.pathname.slice(1)};
+    const v=url.searchParams.get('v'); if(v) return {id:v};
+  }catch(e){}
+  return null;
+}
+function loadYTApi(){
+  if(window.YT||document.getElementById('ytapi')) return;
+  const s=document.createElement('script'); s.id='ytapi'; s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+}
+window.onYouTubeIframeAPIReady=()=>{ ytReady=true; if(pending) startPlayer(pending); };
+let listDone=false, errN=0, unmuted=false;
+function ytMsg(t){ $('ytMsg').textContent=t||''; }
+function initList(p){
+  if(listDone) return;
+  try{ const l=p.getPlaylist&&p.getPlaylist(); if(l&&l.length){ listDone=true; p.setLoop(true); p.setShuffle(true); p.playVideoAt(0); } }catch(_){}
+}
+function startPlayer(src){
+  if(!ytReady){ pending=src; loadYTApi(); return; }
+  if(player && player.destroy){ player.destroy(); $('ytbox').innerHTML='<div id="yt"></div>'; }
+  listDone=false; errN=0; ytMsg('');
+  const vars={playsinline:1,rel:0,autoplay:1,mute:unmuted?0:1};
+  if(/^https?:$/.test(location.protocol)) vars.origin=location.origin;
+  const cfg={width:'100%',height:'100%',playerVars:vars,events:{
+    onReady:e=>{ if(!unmuted){ e.target.mute(); ytMsg('已靜音自動播放，點一下頁面任何位置開啟聲音'); } e.target.playVideo(); if(src.list) initList(e.target); },
+    onStateChange:e=>{ if(src.list) initList(e.target); },
+    onError:e=>{ const c=e.data; ytMsg('無法播放（錯誤 '+c+'）：'+(c==2?'播放清單 ID 無效，請確認網址完整':c==100?'找不到影片，或清單是私人的':'這支影片禁止嵌入，已自動跳過'));
+      if(src.list&&c!=2&&++errN<10){ try{ e.target.nextVideo(); }catch(_){} } }
+  }};
+  if(src.list){ vars.listType='playlist'; vars.list=src.list; } else { cfg.videoId=src.id; }
+  player=new YT.Player('yt',cfg);
+}
+/* 瀏覽器規定有聲音的自動播放需要使用者先互動：先靜音播放，第一次點擊／按鍵時開聲音 */
+function unmute(){
+  if(!player||!player.unMute||!player.getPlayerState) return;
+  try{ player.unMute(); player.setVolume(100); if(player.getPlayerState()!==1) player.playVideo(); }catch(_){}
+  unmuted=true; ytMsg('');
+  ['pointerdown','keydown'].forEach(t=>removeEventListener(t,unmute));
+}
+['pointerdown','keydown'].forEach(t=>addEventListener(t,unmute));
+$('ytGo').onclick=()=>{
+  const src=parseYT($('ytUrl').value);
+  if(!src){ $('ytUrl').value=''; $('ytUrl').placeholder='網址格式不正確，請重新貼上'; return; }
+  store.set('yt',$('ytUrl').value); $('ytLink').href=ytHref(src);
+  unmuted=true; startPlayer(src);
+};
+$('ytToggle').onclick=()=>{
+  if(!player||!player.getPlayerState) return;
+  player.getPlayerState()===1 ? player.pauseVideo() : player.playVideo();
+};
+$('ytSize').onclick=()=>{
+  const m=$('music'); m.classList.toggle('mini');
+  $('ytSize').textContent=m.classList.contains('mini')?'放大':'縮小';
+};
+
+/* ============ 圖庫（MaRi醬） ============ */
+function openGallery(id){
+  const g=GALS.find(x=>x.id===id); if(!g) return showLibrary();
+  $('library').hidden=true; $('chapters').hidden=true; $('reader').hidden=true; $('gallery').hidden=false;
+  history.replaceState(null,'','#g/'+id);
+  $('gTitle').textContent=g.title; $('gBy').textContent=g.blurb||'';
+  const box=$('gGrid'); box.innerHTML='';
+  const imgs=g.images||[];
+  if(!imgs.length) box.textContent='還沒有圖片。請把圖片上傳到 GitHub，再把路徑加進 library.json 的 images。';
+  imgs.forEach(m=>{
+    const src=typeof m==='string'?m:m.src, cap=typeof m==='string'?'':(m.caption||'');
+    const f=document.createElement('button'); f.className='gi';
+    const im=document.createElement('img'); im.src=encodeURI(src); im.alt=cap||g.title; im.loading='lazy';
+    f.appendChild(im);
+    f.onclick=()=>{ $('lbImg').src=im.src; $('lbImg').alt=im.alt; $('lbCap').textContent=cap; $('lb').hidden=false; };
+    box.appendChild(f);
+  });
+  window.scrollTo(0,0);
+}
+$('gBack').onclick=showLibrary;
+$('lb').onclick=()=>$('lb').hidden=true;
+addEventListener('keydown',e=>{ if(e.key==='Escape') $('lb').hidden=true; });
+
+/* ============ 瀏覽次數（CounterAPI，進站累加一次） ============ */
+(async()=>{
+  try{
+    let seg=location.pathname.split('/')[1]||''; if(/\.html?$/.test(seg)) seg='';
+    const ns=(location.hostname+'-'+seg).replace(/[^\w]+/g,'-').replace(/^-|-$/g,'')||'novel';
+    const local=/^(localhost|127\.0\.0\.1|)$/.test(location.hostname)||location.protocol==='file:';
+    const done=sessionStorage.getItem('counted');
+    const r=await fetch('https://api.counterapi.dev/v1/'+ns+'/visits'+(local||done?'':'/up'));
+    const j=await r.json(), n=j.count!=null?j.count:j.value;
+    if(!local) sessionStorage.setItem('counted','1');
+    if(n!=null) $('cnt').textContent=Number(n).toLocaleString();
+  }catch(e){}
+})();
+
+/* ============ 啟動 ============ */
+const savedYT=store.get('yt','');
+if(savedYT) $('ytUrl').value=savedYT;
+const startSrc=parseYT(savedYT)||parseYT(DEFAULT_YT);
+if(startSrc){ $('ytLink').href=ytHref(startSrc); loadYTApi(); pending=startSrc; }
+(async()=>{
+  try{
+    const r=await fetch('library.json');
+    const j=await r.json(); BOOKS=j.books||[]; GALS=j.galleries||[];
+  }catch(e){
+    $('shelf').textContent='讀不到 library.json。請確認檔案已上傳，且格式正確。';
+    return;
+  }
+  buildShelf();
+  const m=location.hash.slice(1).split('/');
+  if(m[0]==='g') openGallery(m[1]);
+  else if(m[0]) openBook(m[0], m[1]!==undefined?+m[1]:undefined, m[2]!==undefined?+m[2]:undefined);
+})();
+</script>
+</body>
+</html>
