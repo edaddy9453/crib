@@ -8,7 +8,17 @@
         { "title": "Chapter 1", "file": "books/MaRi Go ARound/chapter1.txt" },
         { "title": "Chapter 2", "file": "books/MaRi Go ARound/chapter2.txt" },
         { "title": "Chapter 3", "file": "books/MaRi Go ARound/chapter3.txt" },
-        { "title": "Chapter 4", "file": "books/MaRi Go ARound/chapter4.txt" }        
+        { "title": "Chapter 4", "file": "books/MaRi Go ARound/chapter4.txt" }
+      ]
+    }
+  ],
+  "galleries": [
+    {
+      "id": "mari",
+      "title": "MaRi醬",
+      "blurb": "MaRi醬的形象圖片",
+      "images": [
+        { "src": "images/mari/a02.png", "caption": "MaRi醬" }
       ]
     }
   ]

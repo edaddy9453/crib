@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Crib By EDaddy</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --lav:#e9dcf5; --pink:#f8dfec; --mint:#d3ecdf; --sage:#86b9a0;
@@ -20,7 +17,7 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);background-attachment:fixed;color:var(--ink);
-  font-family:"Noto Serif TC","PMingLiU",serif;line-height:1.9}
+  font-family:"Microsoft JhengHei","微軟正黑體","PingFang TC","Noto Sans TC",sans-serif;line-height:1.9}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--sage);outline-offset:2px}
 [hidden]{display:none!important}
@@ -39,7 +36,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .book p{margin:0;font-size:.9rem;line-height:1.7}
 
 /* 閱讀 */
-#reader{height:100dvh;display:flex;flex-direction:column;padding:12px 12px 0}
+#reader{height:100dvh;display:flex;flex-direction:column;padding:12px 12px 34px}
 .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:760px;width:100%;margin:0 auto 8px}
 .bar .title{flex:1 1 80px;text-align:center;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:.85rem}
@@ -54,8 +51,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .edge{position:absolute;top:0;bottom:0;width:22%;background:none;border:0;z-index:2}
 .edge.l{left:0}.edge.r{right:0}
 .foot{max-width:760px;width:100%;margin:8px auto;display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--soft)}
-.foot .track{flex:1;height:6px;border-radius:6px;background:var(--line);overflow:hidden}
-.foot .fill{height:100%;width:0;background:var(--sage);transition:width .3s}
+.foot input{flex:1;min-width:0;accent-color:var(--sage);cursor:pointer}
 .foot button{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px}
 #toc,#bmPanel{position:fixed;inset:0;background:rgba(60,40,80,.35);z-index:20;display:grid;place-items:center}
 #toc .box,#bmPanel .box{background:var(--paper);border-radius:16px;padding:22px;width:min(420px,90vw);max-height:80vh;overflow:auto}
@@ -63,21 +59,38 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* 章節選取頁 */
 #chapters{max-width:760px;margin:0 auto;padding:36px 20px 160px}
-#chapters h1{font-size:1.7rem;margin:14px 0 4px;letter-spacing:.08em}
-#chapters .by{color:var(--soft);margin:0 0 18px}
+#chapters h1,#gallery h1{font-size:1.7rem;margin:14px 0 4px;letter-spacing:.08em}
+#chapters .by,#gallery .by{color:var(--soft);margin:0 0 18px}
 .chlist{margin-top:18px}
 .chlist button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:8px}
 .chlist button:hover{border-color:var(--sage)}
 .chlist small{color:var(--soft);white-space:nowrap}
 #ytLink{display:inline-flex;align-items:center;padding:0 4px}
 
+/* 圖庫 */
+#gallery{max-width:880px;margin:0 auto;padding:36px 20px 160px}
+#gGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.gi{padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);aspect-ratio:2/3}
+.gi img{width:100%;height:100%;object-fit:cover;display:block}
+.book.gal{box-shadow:-6px 0 0 #e6a8c8 inset, 0 8px 22px rgba(120,90,150,.14)}
+#lb{position:fixed;inset:0;background:rgba(40,25,55,.88);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:82vh;border-radius:10px}
+#lb p{color:#fff;margin:8px 0 0}
+/* 瀏覽次數 */
+#counter{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px;font-size:.78rem;color:var(--soft);pointer-events:none}
+@media (max-width:600px){#counter{left:12px;transform:none}}
+#library[hidden] ~ #counter{display:none}
+
 /* 音樂播放器 */
 #music{position:fixed;right:12px;bottom:12px;z-index:10;width:230px;background:var(--paper);
   border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 10px 30px rgba(120,90,150,.25);font-size:.8rem}
 #music.mini{width:150px}
+#music{transition:transform .25s}
+#music.away{transform:translateY(calc(100% + 24px));pointer-events:none}
+#plShow{position:fixed;right:12px;bottom:12px;z-index:10;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:1.25rem;box-shadow:0 8px 22px rgba(120,90,150,.25)}
 #ytbox{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--mint)}
 #ytbox iframe{width:100%;height:100%;display:block}
-#music .row{display:flex;gap:6px;margin-top:6px}
+#music .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 #music input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:transparent;color:var(--ink);font:inherit}
 #music button{border:1px solid var(--line);background:var(--mint);border-radius:8px;padding:2px 10px;color:#2f4a3f}
 @media (prefers-color-scheme: dark){#music button{color:var(--ink)}}
@@ -102,6 +115,13 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="chlist" id="chList"></div>
 </section>
 
+<section id="gallery" hidden>
+  <button class="chip" id="gBack">← 回去</button>
+  <h1 id="gTitle"></h1>
+  <p class="by" id="gBy"></p>
+  <div id="gGrid"></div>
+</section>
+
 <section id="reader" hidden>
   <div class="bar">
     <button class="chip" id="back">← 章節</button>
@@ -117,7 +137,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <button class="edge r" id="next" aria-label="下一頁"></button>
     <div class="sheet" id="sheet"><div class="view" id="view"><div class="inner" id="inner"></div></div></div>
   </div>
-  <div class="foot"><span id="pg"></span><div class="track"><div class="fill" id="fill"></div></div></div>
+  <div class="foot"><span id="pg"></span><input type="range" id="seek" min="0" max="0" value="0" aria-label="拖動跳到指定頁數"></div>
 </section>
 
 <div id="toc" hidden><div class="box"><div id="tocList"></div><p><button class="chip" id="tocClose">關閉</button></p></div></div>
@@ -133,13 +153,19 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="row">
     <button id="ytToggle">暫停／繼續</button>
     <button id="ytSize">縮小</button>
-    <a id="ytLink" href="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=JOk0rAruGAYjM8FV" target="_blank" rel="noopener" aria-label="在 YouTube Music 開啟播放清單" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
+    <button id="ytHide">隱藏</button>
+    <a id="ytLink" href="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp" target="_blank" rel="noopener" aria-label="在 YouTube Music 開啟播放清單" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
   </div>
+  <div id="ytMsg" role="status" style="font-size:.74rem;color:var(--soft);margin-top:4px"></div>
 </aside>
+
+<button id="plShow" hidden aria-label="顯示音樂播放器" title="音樂播放器">🎵</button>
+<div id="lb" hidden><img id="lbImg" alt=""><p id="lbCap"></p></div>
+<div id="counter" aria-live="polite">瀏覽次數 <b id="cnt">—</b></div>
 
 <script>
 /* 書籍資料從 library.json 讀取，章節文字從 books/ 資料夾讀取 */
-let BOOKS = [];
+let BOOKS = [], GALS = [];
 const cache = {};
 
 /* ============ 閱讀器 ============ */
@@ -151,7 +177,7 @@ const store = {
 let book=null, ch=0, page=0, pages=1, GAP=60, fs=store.get('fs',1.1);
 
 function showLibrary(){
-  $('reader').hidden=true; $('chapters').hidden=true; $('library').hidden=false; history.replaceState(null,'','#');
+  $('reader').hidden=true; $('chapters').hidden=true; $('gallery').hidden=true; $('library').hidden=false; history.replaceState(null,'','#');
 }
 function buildShelf(){
   $('shelf').innerHTML='';
@@ -159,9 +185,18 @@ function buildShelf(){
     const el=document.createElement('button'); el.className='book';
     el.innerHTML=`<h2></h2><div class="by"></div><p></p>`;
     el.querySelector('h2').textContent=b.title;
-    el.querySelector('.by').textContent=b.author;
-    el.querySelector('p').textContent=b.blurb;
+    el.querySelector('.by').textContent=b.author||'';
+    el.querySelector('p').textContent=b.blurb||'';
     el.onclick=()=>openBook(b.id);
+    $('shelf').appendChild(el);
+  });
+  GALS.forEach(g=>{
+    const el=document.createElement('button'); el.className='book gal';
+    el.innerHTML=`<h2></h2><div class="by"></div><p></p>`;
+    el.querySelector('h2').textContent=g.title;
+    el.querySelector('.by').textContent='圖庫・'+(g.images||[]).length+' 張';
+    el.querySelector('p').textContent=g.blurb||'';
+    el.onclick=()=>openGallery(g.id);
     $('shelf').appendChild(el);
   });
 }
@@ -171,10 +206,10 @@ function openBook(id, c, p){
   readAt(c,p,null);
 }
 function showChapters(){
-  $('library').hidden=true; $('reader').hidden=true; $('chapters').hidden=false;
+  $('library').hidden=true; $('reader').hidden=true; $('gallery').hidden=true; $('chapters').hidden=false;
   history.replaceState(null,'','#'+book.id);
   $('chTitle').textContent=book.title;
-  $('chBy').textContent=book.author+(book.blurb?'　'+book.blurb:'');
+  $('chBy').textContent=[book.author,book.blurb].filter(Boolean).join('　');
   const saved=store.get('pos-'+book.id,null);
   $('chCont').textContent=saved?`繼續閱讀（第 ${saved.ch+1} 章）`:'開始閱讀';
   $('chCont').onclick=()=>saved?readAt(saved.ch,saved.page,saved.r):readAt(0,0,null);
@@ -191,7 +226,7 @@ function showChapters(){
   window.scrollTo(0,0);
 }
 function readAt(c,p,r){
-  ch=c; $('chapters').hidden=true; $('library').hidden=true; $('reader').hidden=false;
+  ch=c; $('chapters').hidden=true; $('library').hidden=true; $('gallery').hidden=true; $('reader').hidden=false;
   $('rtitle').textContent=book.title;
   renderChapter(p||0,r);
 }
@@ -230,7 +265,7 @@ function show(){
   $('inner').style.transform=`translateX(${-page*(W+GAP)}px)`;
   const total=book.chapters.length;
   $('pg').textContent=`第 ${ch+1}／${total} 章　${page+1}／${pages} 頁`;
-  $('fill').style.width=(((ch+(page+1)/pages)/total)*100)+'%';
+  $('seek').max=pages-1; $('seek').value=page;
   store.set('pos-'+book.id,{ch,page,r:page/pages});
   $('bmAdd').textContent=bmIndex()>=0?'★ 已加書籤':'☆ 加書籤';
   history.replaceState(null,'',`#${book.id}/${ch}/${page}`);
@@ -262,6 +297,7 @@ function openToc(){
 }
 
 $('prev').onclick=()=>turn(-1); $('next').onclick=()=>turn(1);
+$('seek').oninput=e=>{page=+e.target.value;show();};
 $('back').onclick=showChapters; $('chBack').onclick=showLibrary; $('tocBtn').onclick=openToc; $('tocClose').onclick=()=>$('toc').hidden=true;
 $('fsUp').onclick=()=>{fs=Math.min(1.6,fs+.1);store.set('fs',fs);layout(0,page/pages);};
 $('fsDown').onclick=()=>{fs=Math.max(.9,fs-.1);store.set('fs',fs);layout(0,page/pages);};
@@ -307,7 +343,7 @@ $('bmAdd').onclick=toggleBm; $('bmList').onclick=openBm; $('bmLib').onclick=open
 $('bmClose').onclick=()=>$('bmPanel').hidden=true;
 
 /* ============ YouTube 音樂播放器（翻頁時不會中斷） ============ */
-const DEFAULT_YT='https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=JOk0rAruGAYjM8FV';
+const DEFAULT_YT='https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp';
 function ytHref(src){ return src.list?'https://music.youtube.com/playlist?list='+encodeURIComponent(src.list):'https://music.youtube.com/watch?v='+encodeURIComponent(src.id); }
 let player=null, ytReady=false, pending=null;
 function parseYT(u){
@@ -325,20 +361,40 @@ function loadYTApi(){
   const s=document.createElement('script'); s.id='ytapi'; s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
 }
 window.onYouTubeIframeAPIReady=()=>{ ytReady=true; if(pending) startPlayer(pending); };
+let listDone=false, errN=0, unmuted=false;
+function ytMsg(t){ $('ytMsg').textContent=t||''; }
+function initList(p){
+  if(listDone) return;
+  try{ const l=p.getPlaylist&&p.getPlaylist(); if(l&&l.length){ listDone=true; p.setLoop(true); p.setShuffle(true); p.playVideoAt(0); } }catch(_){}
+}
 function startPlayer(src){
   if(!ytReady){ pending=src; loadYTApi(); return; }
   if(player && player.destroy){ player.destroy(); $('ytbox').innerHTML='<div id="yt"></div>'; }
-  const vars={playsinline:1,rel:0};
-  const cfg={width:'100%',height:'100%',playerVars:vars,events:{onReady:e=>{ if(src.list){ try{ e.target.setShuffle(true); e.target.setLoop(true); }catch(_){} } }}};
+  listDone=false; errN=0; ytMsg('');
+  const vars={playsinline:1,rel:0,autoplay:1,mute:unmuted?0:1};
+  if(/^https?:$/.test(location.protocol)) vars.origin=location.origin;
+  const cfg={width:'100%',height:'100%',playerVars:vars,events:{
+    onReady:e=>{ if(!unmuted){ e.target.mute(); ytMsg('已靜音自動播放，點一下頁面任何位置開啟聲音'); } e.target.playVideo(); if(src.list) initList(e.target); },
+    onStateChange:e=>{ if(src.list) initList(e.target); },
+    onError:e=>{ const c=e.data; ytMsg('無法播放（錯誤 '+c+'）：'+(c==2?'播放清單 ID 無效，請確認網址完整':c==100?'找不到影片，或清單是私人的':'這支影片禁止嵌入，已自動跳過'));
+      if(src.list&&c!=2&&++errN<10){ try{ e.target.nextVideo(); }catch(_){} } }
+  }};
   if(src.list){ vars.listType='playlist'; vars.list=src.list; } else { cfg.videoId=src.id; }
   player=new YT.Player('yt',cfg);
 }
+/* 瀏覽器規定有聲音的自動播放需要使用者先互動：先靜音播放，第一次點擊／按鍵時開聲音 */
+function unmute(){
+  if(!player||!player.unMute||!player.getPlayerState) return;
+  try{ player.unMute(); player.setVolume(100); if(player.getPlayerState()!==1) player.playVideo(); }catch(_){}
+  unmuted=true; ytMsg('');
+  ['pointerdown','keydown'].forEach(t=>removeEventListener(t,unmute));
+}
+['pointerdown','keydown'].forEach(t=>addEventListener(t,unmute));
 $('ytGo').onclick=()=>{
   const src=parseYT($('ytUrl').value);
   if(!src){ $('ytUrl').value=''; $('ytUrl').placeholder='網址格式不正確，請重新貼上'; return; }
   store.set('yt',$('ytUrl').value); $('ytLink').href=ytHref(src);
-  startPlayer(src);
-  setTimeout(()=>{ try{player.playVideo();}catch(e){} },1200);
+  unmuted=true; startPlayer(src);
 };
 $('ytToggle').onclick=()=>{
   if(!player||!player.getPlayerState) return;
@@ -349,6 +405,48 @@ $('ytSize').onclick=()=>{
   $('ytSize').textContent=m.classList.contains('mini')?'放大':'縮小';
 };
 
+/* 隱藏／喚出播放器（音樂不會中斷；記住讀者的選擇） */
+function setAway(a){ $('music').classList.toggle('away',a); $('music').inert=a; $('plShow').hidden=!a; store.set('plAway',a); }
+$('ytHide').onclick=()=>setAway(true); $('plShow').onclick=()=>setAway(false);
+setAway(!!store.get('plAway',false));
+
+/* ============ 圖庫（MaRi醬） ============ */
+function openGallery(id){
+  const g=GALS.find(x=>x.id===id); if(!g) return showLibrary();
+  $('library').hidden=true; $('chapters').hidden=true; $('reader').hidden=true; $('gallery').hidden=false;
+  history.replaceState(null,'','#g/'+id);
+  $('gTitle').textContent=g.title; $('gBy').textContent=g.blurb||'';
+  const box=$('gGrid'); box.innerHTML='';
+  const imgs=g.images||[];
+  if(!imgs.length) box.textContent='還沒有圖片。請把圖片上傳到 GitHub，再把路徑加進 library.json 的 images。';
+  imgs.forEach(m=>{
+    const src=typeof m==='string'?m:m.src, cap=typeof m==='string'?'':(m.caption||'');
+    const f=document.createElement('button'); f.className='gi';
+    const im=document.createElement('img'); im.src=encodeURI(src); im.alt=cap||g.title; im.loading='lazy';
+    f.appendChild(im);
+    f.onclick=()=>{ $('lbImg').src=im.src; $('lbImg').alt=im.alt; $('lbCap').textContent=cap; $('lb').hidden=false; };
+    box.appendChild(f);
+  });
+  window.scrollTo(0,0);
+}
+$('gBack').onclick=showLibrary;
+$('lb').onclick=()=>$('lb').hidden=true;
+addEventListener('keydown',e=>{ if(e.key==='Escape') $('lb').hidden=true; });
+
+/* ============ 瀏覽次數（CounterAPI，進站累加一次） ============ */
+(async()=>{
+  try{
+    let seg=location.pathname.split('/')[1]||''; if(/\.html?$/.test(seg)) seg='';
+    const ns=(location.hostname+'-'+seg).replace(/[^\w]+/g,'-').replace(/^-|-$/g,'')||'novel';
+    const local=/^(localhost|127\.0\.0\.1|)$/.test(location.hostname)||location.protocol==='file:';
+    const done=sessionStorage.getItem('counted');
+    const r=await fetch('https://api.counterapi.dev/v1/'+ns+'/visits'+(local||done?'':'/up'));
+    const j=await r.json(), n=j.count!=null?j.count:j.value;
+    if(!local) sessionStorage.setItem('counted','1');
+    if(n!=null) $('cnt').textContent=Number(n).toLocaleString();
+  }catch(e){}
+})();
+
 /* ============ 啟動 ============ */
 const savedYT=store.get('yt','');
 if(savedYT) $('ytUrl').value=savedYT;
@@ -357,14 +455,15 @@ if(startSrc){ $('ytLink').href=ytHref(startSrc); loadYTApi(); pending=startSrc; 
 (async()=>{
   try{
     const r=await fetch('library.json');
-    BOOKS=(await r.json()).books;
+    const j=await r.json(); BOOKS=j.books||[]; GALS=j.galleries||[];
   }catch(e){
     $('shelf').textContent='讀不到 library.json。請確認檔案已上傳，且格式正確。';
     return;
   }
   buildShelf();
   const m=location.hash.slice(1).split('/');
-  if(m[0]) openBook(m[0], m[1]!==undefined?+m[1]:undefined, m[2]!==undefined?+m[2]:undefined);
+  if(m[0]==='g') openGallery(m[1]);
+  else if(m[0]) openBook(m[0], m[1]!==undefined?+m[1]:undefined, m[2]!==undefined?+m[2]:undefined);
 })();
 </script>
 </body>
