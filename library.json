@@ -21,5 +21,9 @@
         { "src": "images/mari/a02.png", "caption": "MaRi醬" }
       ]
     }
-  ]
+  ],
+  "music": {
+    "youtube": "https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp",
+    "tracks": []
+  }
 }

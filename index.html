@@ -69,16 +69,25 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* 圖庫 */
 #gallery{max-width:880px;margin:0 auto;padding:36px 20px 160px}
-#gGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-.gi{padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);aspect-ratio:2/3}
-.gi img{width:100%;height:100%;object-fit:cover;display:block}
+#gGrid{column-width:200px;column-gap:14px}
+.gi{display:block;width:100%;margin:0 0 14px;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);break-inside:avoid;min-height:120px}
+.gi img{width:100%;height:auto;display:block}
+.gi .miss{display:block;padding:14px;font-size:.8rem;color:var(--soft);word-break:break-all;text-align:left}
+.cover{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center 20%;border-radius:8px;margin:0 0 10px}
 .book.gal{box-shadow:-6px 0 0 #e6a8c8 inset, 0 8px 22px rgba(120,90,150,.14)}
 #lb{position:fixed;inset:0;background:rgba(40,25,55,.88);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
 #lb img{max-width:100%;max-height:82vh;border-radius:10px}
 #lb p{color:#fff;margin:8px 0 0}
-/* 瀏覽次數 */
-#counter{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 14px;font-size:.78rem;color:var(--soft);pointer-events:none}
+/* 瀏覽次數（機械式計數器） */
+#counter{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--soft);pointer-events:none}
+#counter .lbl{letter-spacing:.1em}
+.odo{display:inline-flex;gap:3px;padding:3px;border-radius:7px;background:#3b2f4a;box-shadow:0 2px 6px rgba(60,40,80,.3), inset 0 0 0 1px rgba(255,255,255,.12)}
+.dg{width:1.15rem;height:1.7rem;overflow:hidden;border-radius:4px;background:linear-gradient(#4b3d5e 0 49%,#3a2e49 51% 100%);position:relative}
+.dg::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.4)}
+.dg i{display:block;font-style:normal;transition:transform 1.4s cubic-bezier(.2,.8,.2,1);transform:translateY(calc(var(--d,0) * -10%))}
+.dg b{display:block;height:1.7rem;text-align:center;font:600 1rem/1.7rem ui-monospace,Menlo,Consolas,monospace;color:#f8dfec}
 @media (max-width:600px){#counter{left:12px;transform:none}}
+@media (prefers-reduced-motion: reduce){.dg i{transition:none}}
 #library[hidden] ~ #counter{display:none}
 
 /* 音樂播放器 */
@@ -88,10 +97,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 #music{transition:transform .25s}
 #music.away{transform:translateY(calc(100% + 24px));pointer-events:none}
 #plShow{position:fixed;right:12px;bottom:12px;z-index:10;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:1.25rem;box-shadow:0 8px 22px rgba(120,90,150,.25)}
+#auBox{aspect-ratio:16/9;border-radius:10px;background:var(--mint);display:grid;place-items:center;text-align:center;padding:8px;color:#2f4a3f;font-size:.85rem;line-height:1.6}
+@media (prefers-color-scheme: dark){#auBox{color:var(--ink)}}
+#music button.on{background:var(--sage);color:#fff}
 #ytbox{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--mint)}
 #ytbox iframe{width:100%;height:100%;display:block}
 #music .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-#music input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:transparent;color:var(--ink);font:inherit}
+#music input,#music textarea{flex:1;resize:none;min-width:0;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:transparent;color:var(--ink);font:inherit}
 #music button{border:1px solid var(--line);background:var(--mint);border-radius:8px;padding:2px 10px;color:#2f4a3f}
 @media (prefers-color-scheme: dark){#music button{color:var(--ink)}}
 @media (max-width:600px){.sheet{padding:22px 20px}#music{width:170px}#music.mini{width:120px}}
@@ -145,23 +157,27 @@ button{font:inherit;color:inherit;cursor:pointer}
 <div id="bmPanel" hidden><div class="box"><b>我的書籤</b><div id="bmListBox"></div><p><button class="chip" id="bmClose">關閉</button></p></div></div>
 
 <aside id="music" aria-label="音樂播放器">
+  <div class="row" style="margin:0 0 6px"><button id="srcYT" class="on">YouTube</button><button id="srcAU">音檔</button></div>
   <div id="ytbox"><div id="yt"></div></div>
-  <div class="row">
-    <input id="ytUrl" placeholder="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp" aria-label="YouTube 網址">
+  <div id="auBox" hidden><span id="auTitle">♪</span></div>
+  <div class="row" id="ytRow">
+    <textarea id="ytUrl" rows="2" placeholder="貼上 YouTube 播放清單或影片網址（可貼多支，用空白或換行分開）" aria-label="YouTube 網址"></textarea>
     <button id="ytGo">播放</button>
   </div>
   <div class="row">
-    <button id="ytToggle">暫停／繼續</button>
+    <button id="pPrev" aria-label="上一首">⏮</button><button id="pToggle" aria-label="暫停或繼續">⏯</button><button id="pNext" aria-label="下一首">⏭</button><button id="pShuf" class="on" aria-label="隨機播放">🔀</button>
+  </div>
+  <div class="row">
     <button id="ytSize">縮小</button>
     <button id="ytHide">隱藏</button>
-    <a id="ytLink" href="https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp" target="_blank" rel="noopener" aria-label="在 YouTube Music 開啟播放清單" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
+    <a id="ytLink" href="#" target="_blank" rel="noopener" hidden aria-label="在 YouTube Music 開啟" title="在 YouTube Music 開啟"><svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="6" fill="#f00"/><path d="M11 5.5l8 4.5-8 4.5z" fill="#fff"/></svg></a>
   </div>
   <div id="ytMsg" role="status" style="font-size:.74rem;color:var(--soft);margin-top:4px"></div>
 </aside>
 
 <button id="plShow" hidden aria-label="顯示音樂播放器" title="音樂播放器">🎵</button>
 <div id="lb" hidden><img id="lbImg" alt=""><p id="lbCap"></p></div>
-<div id="counter" aria-live="polite">瀏覽次數 <b id="cnt">—</b></div>
+<div id="counter" role="status" hidden><span class="lbl">瀏覽次數</span><span class="odo" id="odo"></span></div>
 
 <script>
 /* 書籍資料從 library.json 讀取，章節文字從 books/ 資料夾讀取 */
@@ -196,6 +212,8 @@ function buildShelf(){
     el.querySelector('h2').textContent=g.title;
     el.querySelector('.by').textContent='圖庫・'+(g.images||[]).length+' 張';
     el.querySelector('p').textContent=g.blurb||'';
+    const first=(g.images||[])[0];
+    if(first){ const cv=document.createElement('img'); cv.className='cover'; cv.alt=''; el.insertBefore(cv,el.firstChild); loadImg(cv,typeof first==='string'?first:first.src,()=>cv.remove()); }
     el.onclick=()=>openGallery(g.id);
     $('shelf').appendChild(el);
   });
@@ -342,63 +360,132 @@ function openBm(){
 $('bmAdd').onclick=toggleBm; $('bmList').onclick=openBm; $('bmLib').onclick=openBm;
 $('bmClose').onclick=()=>$('bmPanel').hidden=true;
 
-/* ============ YouTube 音樂播放器（翻頁時不會中斷） ============ */
-const DEFAULT_YT='https://music.youtube.com/playlist?list=PLGKgRxS3ghqU&si=4FbN979X1NQoW9Dp';
-function ytHref(src){ return src.list?'https://music.youtube.com/playlist?list='+encodeURIComponent(src.list):'https://music.youtube.com/watch?v='+encodeURIComponent(src.id); }
-let player=null, ytReady=false, pending=null;
+/* ============ 音樂播放器（YouTube 或自己的 mp3；換頁不會中斷） ============ */
+let MUSIC={}, mode='yt', player=null, ytReady=false, pending=null, curYT=null;
+let listDone=false, errN=0, gestured=false, shuf=store.get('shuf',true);
+let tracks=[], order=[], ti=0, wantPlay=false;
+const au=new Audio(); au.preload='none';
+function ytMsg(t){ $('ytMsg').textContent=t||''; }
+function ytHref(src){ return src.list?'https://music.youtube.com/playlist?list='+encodeURIComponent(src.list):'https://music.youtube.com/watch?v='+encodeURIComponent(src.ids[0]); }
 function parseYT(u){
-  try{
-    const url=new URL(u.trim());
-    const list=url.searchParams.get('list');
-    if(list) return {list};
-    if(url.hostname.includes('youtu.be')) return {id:url.pathname.slice(1)};
-    const v=url.searchParams.get('v'); if(v) return {id:v};
-  }catch(e){}
-  return null;
+  const s=String(u||'');
+  const list=(s.match(/[?&]list=([\w-]+)/)||[])[1]||'';
+  const ids=[], re=/(?:[?&]v=|youtu\.be\/|\/embed\/|\/shorts\/)([\w-]{11})/g; let m;
+  while((m=re.exec(s))) if(!ids.includes(m[1])) ids.push(m[1]);
+  return (list||ids.length)?{list,ids}:null;
 }
 function loadYTApi(){
   if(window.YT||document.getElementById('ytapi')) return;
   const s=document.createElement('script'); s.id='ytapi'; s.src='https://www.youtube.com/iframe_api'; document.head.appendChild(s);
 }
-window.onYouTubeIframeAPIReady=()=>{ ytReady=true; if(pending) startPlayer(pending); };
-let listDone=false, errN=0, unmuted=false;
-function ytMsg(t){ $('ytMsg').textContent=t||''; }
+window.onYouTubeIframeAPIReady=()=>{ ytReady=true; if(pending){ const p=pending; pending=null; startPlayer(p); } };
 function initList(p){
   if(listDone) return;
-  try{ const l=p.getPlaylist&&p.getPlaylist(); if(l&&l.length){ listDone=true; p.setLoop(true); p.setShuffle(true); p.playVideoAt(0); } }catch(_){}
+  try{ const l=p.getPlaylist&&p.getPlaylist(); if(l&&l.length){ listDone=true; p.setLoop(true); p.setShuffle(shuf); p.playVideoAt(0); } }catch(_){}
 }
 function startPlayer(src){
+  curYT=src;
+  if(!ytReady&&window.YT&&YT.Player) ytReady=true;
   if(!ytReady){ pending=src; loadYTApi(); return; }
-  if(player && player.destroy){ player.destroy(); $('ytbox').innerHTML='<div id="yt"></div>'; }
+  if(player&&player.destroy){ try{player.destroy();}catch(_){} $('ytbox').innerHTML='<div id="yt"></div>'; }
   listDone=false; errN=0; ytMsg('');
-  const vars={playsinline:1,rel:0,autoplay:1,mute:unmuted?0:1};
+  const vars={playsinline:1,rel:0,autoplay:1,mute:gestured?0:1};
   if(/^https?:$/.test(location.protocol)) vars.origin=location.origin;
   const cfg={width:'100%',height:'100%',playerVars:vars,events:{
-    onReady:e=>{ if(!unmuted){ e.target.mute(); ytMsg('已靜音自動播放，點一下頁面任何位置開啟聲音'); } e.target.playVideo(); if(src.list) initList(e.target); },
+    onReady:e=>{
+      if(gestured){ try{e.target.unMute();}catch(_){} } else { e.target.mute(); ytMsg('已靜音自動播放，點一下頁面任何位置開啟聲音'); }
+      e.target.playVideo(); if(src.list) initList(e.target);
+    },
     onStateChange:e=>{ if(src.list) initList(e.target); },
-    onError:e=>{ const c=e.data; ytMsg('無法播放（錯誤 '+c+'）：'+(c==2?'播放清單 ID 無效，請確認網址完整':c==100?'找不到影片，或清單是私人的':'這支影片禁止嵌入，已自動跳過'));
-      if(src.list&&c!=2&&++errN<10){ try{ e.target.nextVideo(); }catch(_){} } }
+    onError:e=>{
+      const c=e.data;
+      if(src.list&&src.ids.length&&[2,100,101,150].includes(c)&&!src.fb){ ytMsg('播放清單無法使用，改播單支影片'); setTimeout(()=>startPlayer({list:'',ids:src.ids,fb:1}),0); return; }
+      const why=c==2?'播放清單 ID 無效或被截斷，請貼上完整網址':c==100?'找不到影片，或清單是私人的':(c==101||c==150)?'這支影片不允許嵌入':'播放發生錯誤';
+      ytMsg('無法播放（錯誤 '+c+'）：'+why);
+      if(c!=2&&c!=100&&(src.list||src.ids.length>1)&&++errN<10){ try{ e.target.nextVideo(); }catch(_){} }
+    }
   }};
-  if(src.list){ vars.listType='playlist'; vars.list=src.list; } else { cfg.videoId=src.id; }
+  if(src.list){ vars.listType='playlist'; vars.list=src.list; }
+  else{
+    const ids=src.ids.slice().sort(()=>Math.random()-.5);
+    cfg.videoId=ids[0]; vars.loop=1; vars.playlist=ids.length>1?ids.slice(1).join(','):ids[0];
+  }
   player=new YT.Player('yt',cfg);
 }
-/* 瀏覽器規定有聲音的自動播放需要使用者先互動：先靜音播放，第一次點擊／按鍵時開聲音 */
-function unmute(){
-  if(!player||!player.unMute||!player.getPlayerState) return;
-  try{ player.unMute(); player.setVolume(100); if(player.getPlayerState()!==1) player.playVideo(); }catch(_){}
-  unmuted=true; ytMsg('');
-  ['pointerdown','keydown'].forEach(t=>removeEventListener(t,unmute));
+/* mp3 音檔播放 */
+function showTitle(){ const t=tracks[order[ti]]||{}; $('auTitle').textContent='♪ '+(ti+1)+'／'+order.length+'　'+(t.title||String(t.src||'').split('/').pop()); }
+function buildOrder(){ order=tracks.map((_,i)=>i); if(shuf) order.sort(()=>Math.random()-.5); ti=0; }
+function loadTrack(){ au.src=encodeURI(tracks[order[ti]].src); showTitle(); }
+function playAudio(){
+  const p=au.play();
+  if(p&&p.then) p.then(()=>{ wantPlay=false; ytMsg(''); }).catch(()=>{ wantPlay=true; ytMsg('點一下頁面任何位置開始播放音樂'); });
 }
-['pointerdown','keydown'].forEach(t=>addEventListener(t,unmute));
+function audioNext(d){ if(!order.length) return; ti=(ti+d+order.length)%order.length; loadTrack(); playAudio(); }
+au.addEventListener('ended',()=>audioNext(1));
+au.addEventListener('playing',()=>{ errN=0; ytMsg(''); });
+au.addEventListener('error',()=>{
+  const t=tracks[order[ti]]||{}; ytMsg('這首無法播放：'+(t.src||'')+'（請確認檔案已上傳、檔名一致）');
+  if(++errN<tracks.length) setTimeout(()=>audioNext(1),800);
+});
+/* 瀏覽器規定有聲音的播放需要使用者先互動：第一次點擊／按鍵時開聲音 */
+function onGesture(){
+  gestured=true; ['pointerdown','keydown'].forEach(t=>removeEventListener(t,onGesture));
+  try{
+    if(mode==='yt'&&player&&player.unMute){ player.unMute(); player.setVolume(100); if(player.getPlayerState()!==1) player.playVideo(); ytMsg(''); }
+    else if(mode==='au'&&wantPlay) playAudio();
+  }catch(_){}
+}
+['pointerdown','keydown'].forEach(t=>addEventListener(t,onGesture));
+/* 切換音源 */
+function setMode(m){
+  if(m==='au'&&!tracks.length){ ytMsg('尚未設定音檔：請把 mp3 放進 music 資料夾，並在 library.json 的 music.tracks 加入。'); return; }
+  mode=m; store.set('pmode',m);
+  $('ytbox').hidden=m!=='yt'; $('auBox').hidden=m!=='au'; $('ytRow').hidden=m!=='yt';
+  $('srcYT').classList.toggle('on',m==='yt'); $('srcAU').classList.toggle('on',m==='au');
+  $('ytLink').hidden=m!=='yt'||!curYT;
+  ytMsg('');
+  if(m==='yt'){
+    try{ au.pause(); }catch(_){} wantPlay=false;
+    if(player&&player.playVideo){ try{player.playVideo();}catch(_){} }
+    else if(curYT) startPlayer(curYT);
+    else ytMsg('尚未設定 YouTube 清單，請在下方貼上網址。');
+  }else{
+    try{ player&&player.pauseVideo&&player.pauseVideo(); }catch(_){}
+    if(!order.length){ buildOrder(); loadTrack(); } else showTitle();
+    playAudio();
+  }
+}
+function initMusic(){
+  tracks=(MUSIC.tracks||[]).filter(t=>t&&t.src);
+  const saved=store.get('yt','');
+  if(saved) $('ytUrl').value=saved;
+  const src=parseYT(saved)||parseYT(MUSIC.youtube||'');
+  if(src){ curYT=src; $('ytLink').href=ytHref(src); loadYTApi(); }
+  $('pShuf').classList.toggle('on',shuf);
+  let m=store.get('pmode',null);
+  if(m!=='yt'&&m!=='au') m=tracks.length?'au':'yt';
+  if(m==='au'&&!tracks.length) m='yt';
+  setMode(m);
+}
+$('srcYT').onclick=()=>setMode('yt'); $('srcAU').onclick=()=>setMode('au');
 $('ytGo').onclick=()=>{
   const src=parseYT($('ytUrl').value);
-  if(!src){ $('ytUrl').value=''; $('ytUrl').placeholder='網址格式不正確，請重新貼上'; return; }
-  store.set('yt',$('ytUrl').value); $('ytLink').href=ytHref(src);
-  unmuted=true; startPlayer(src);
+  if(!src){ ytMsg('網址格式不正確，請貼上 YouTube 影片或播放清單網址'); return; }
+  store.set('yt',$('ytUrl').value); curYT=src; $('ytLink').href=ytHref(src);
+  gestured=true; const had=!!player; setMode('yt'); if(had) startPlayer(src);
 };
-$('ytToggle').onclick=()=>{
-  if(!player||!player.getPlayerState) return;
-  player.getPlayerState()===1 ? player.pauseVideo() : player.playVideo();
+$('pToggle').onclick=()=>{
+  try{
+    if(mode==='yt'){ if(player&&player.getPlayerState) player.getPlayerState()===1?player.pauseVideo():player.playVideo(); }
+    else if(au.paused) playAudio(); else { au.pause(); wantPlay=false; }
+  }catch(_){}
+};
+$('pNext').onclick=()=>{ try{ mode==='yt'?player.nextVideo():audioNext(1); }catch(_){} };
+$('pPrev').onclick=()=>{ try{ mode==='yt'?player.previousVideo():audioNext(-1); }catch(_){} };
+$('pShuf').onclick=()=>{
+  shuf=!shuf; store.set('shuf',shuf); $('pShuf').classList.toggle('on',shuf);
+  if(mode==='yt'){ try{ player.setShuffle(shuf); }catch(_){} }
+  else if(tracks.length){ const cur=order[ti]; order=tracks.map((_,i)=>i); if(shuf) order.sort(()=>Math.random()-.5); ti=Math.max(0,order.indexOf(cur)); showTitle(); }
 };
 $('ytSize').onclick=()=>{
   const m=$('music'); m.classList.toggle('mini');
@@ -411,6 +498,21 @@ $('ytHide').onclick=()=>setAway(true); $('plShow').onclick=()=>setAway(false);
 setAway(!!store.get('plAway',false));
 
 /* ============ 圖庫（MaRi醬） ============ */
+/* 圖片載入失敗時，自動試試其他常見位置（images/mari/、images/、根目錄、副檔名大小寫） */
+function imgCandidates(src){
+  if(/^https?:/i.test(src)) return [src];
+  const base=src.split('/').pop(), dot=base.lastIndexOf('.');
+  const name=dot>0?base.slice(0,dot):base, ext=dot>0?base.slice(dot):'';
+  const names=[base]; [ext.toLowerCase(),ext.toUpperCase()].forEach(e=>{ if(name+e!==base) names.push(name+e); });
+  const out=[src];
+  [src.slice(0,src.length-base.length),'images/mari/','images/',''].forEach(d=>names.forEach(n=>{ const q=d+n; if(!out.includes(q)) out.push(q); }));
+  return out;
+}
+function loadImg(im,src,onFail){
+  const list=imgCandidates(src); let i=0;
+  im.onerror=()=>{ i++; if(i<list.length) im.src=encodeURI(list[i]); else if(onFail) onFail(); };
+  im.src=encodeURI(list[0]);
+}
 function openGallery(id){
   const g=GALS.find(x=>x.id===id); if(!g) return showLibrary();
   $('library').hidden=true; $('chapters').hidden=true; $('reader').hidden=true; $('gallery').hidden=false;
@@ -422,9 +524,15 @@ function openGallery(id){
   imgs.forEach(m=>{
     const src=typeof m==='string'?m:m.src, cap=typeof m==='string'?'':(m.caption||'');
     const f=document.createElement('button'); f.className='gi';
-    const im=document.createElement('img'); im.src=encodeURI(src); im.alt=cap||g.title; im.loading='lazy';
+    const im=document.createElement('img'); im.alt=cap||g.title; im.decoding='async';
     f.appendChild(im);
     f.onclick=()=>{ $('lbImg').src=im.src; $('lbImg').alt=im.alt; $('lbCap').textContent=cap; $('lb').hidden=false; };
+    loadImg(im,src,()=>{
+      f.textContent=''; f.onclick=null;
+      const t=document.createElement('span'); t.className='miss';
+      t.textContent='找不到圖片：'+src+'（請確認 GitHub 上的資料夾、檔名、大小寫與 library.json 完全一致）';
+      f.appendChild(t);
+    });
     box.appendChild(f);
   });
   window.scrollTo(0,0);
@@ -433,7 +541,18 @@ $('gBack').onclick=showLibrary;
 $('lb').onclick=()=>$('lb').hidden=true;
 addEventListener('keydown',e=>{ if(e.key==='Escape') $('lb').hidden=true; });
 
-/* ============ 瀏覽次數（CounterAPI，進站累加一次） ============ */
+/* ============ 瀏覽次數（CounterAPI，進站累加一次；機械式 6 位數） ============ */
+const DIGITS=6;
+function odoSet(n){
+  const t=String(Math.max(0,Math.floor(n))).padStart(DIGITS,'0'), box=$('odo');
+  while(box.children.length<t.length){
+    const d=document.createElement('span'); d.className='dg';
+    d.innerHTML='<i>'+Array.from({length:10},(_,k)=>'<b>'+k+'</b>').join('')+'</i>';
+    box.insertBefore(d,box.firstChild);
+  }
+  [...box.children].forEach((d,i)=>d.firstChild.style.setProperty('--d',t[i]));
+}
+odoSet(0);
 (async()=>{
   try{
     let seg=location.pathname.split('/')[1]||''; if(/\.html?$/.test(seg)) seg='';
@@ -443,23 +562,23 @@ addEventListener('keydown',e=>{ if(e.key==='Escape') $('lb').hidden=true; });
     const r=await fetch('https://api.counterapi.dev/v1/'+ns+'/visits'+(local||done?'':'/up'));
     const j=await r.json(), n=j.count!=null?j.count:j.value;
     if(!local) sessionStorage.setItem('counted','1');
-    if(n!=null) $('cnt').textContent=Number(n).toLocaleString();
+    if(n!=null){
+      $('counter').hidden=false; $('counter').setAttribute('aria-label','瀏覽次數 '+n);
+      setTimeout(()=>odoSet(n),80);
+    }
   }catch(e){}
 })();
 
 /* ============ 啟動 ============ */
-const savedYT=store.get('yt','');
-if(savedYT) $('ytUrl').value=savedYT;
-const startSrc=parseYT(savedYT)||parseYT(DEFAULT_YT);
-if(startSrc){ $('ytLink').href=ytHref(startSrc); loadYTApi(); pending=startSrc; }
 (async()=>{
   try{
     const r=await fetch('library.json');
-    const j=await r.json(); BOOKS=j.books||[]; GALS=j.galleries||[];
+    const j=await r.json(); BOOKS=j.books||[]; GALS=j.galleries||[]; MUSIC=j.music||{};
   }catch(e){
     $('shelf').textContent='讀不到 library.json。請確認檔案已上傳，且格式正確。';
-    return;
   }
+  initMusic();
+  if(!BOOKS.length&&!GALS.length) return;
   buildShelf();
   const m=location.hash.slice(1).split('/');
   if(m[0]==='g') openGallery(m[1]);
