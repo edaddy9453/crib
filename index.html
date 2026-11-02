@@ -4,15 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Crib By EDaddy</title>
+<script>try{const t=JSON.parse(localStorage.getItem("theme"));if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 :root{
   --lav:#e9dcf5; --pink:#f8dfec; --mint:#d3ecdf; --sage:#86b9a0;
   --ink:#4b3d5e; --soft:#7d6e91; --paper:#fffafd; --line:#e4d3ee;
   --bg: linear-gradient(160deg,var(--pink) 0%,var(--lav) 55%,var(--mint) 100%);
 }
+:root{color-scheme:light dark;--bt:#2f4a3f}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark;--lav:#3a3050;--pink:#47304a;--mint:#2c4440;--sage:#8fc5aa;--ink:#f0e6f7;--soft:#bfb0d0;--paper:#2b2438;--line:#4d4062;--bt:#f0e6f7}
 @media (prefers-color-scheme: dark){
-  :root{ --lav:#3a3050; --pink:#47304a; --mint:#2c4440; --sage:#8fc5aa;
-    --ink:#f0e6f7; --soft:#bfb0d0; --paper:#2b2438; --line:#4d4062; }
+  :root:not([data-theme="light"]){--lav:#3a3050;--pink:#47304a;--mint:#2c4440;--sage:#8fc5aa;--ink:#f0e6f7;--soft:#bfb0d0;--paper:#2b2438;--line:#4d4062;--bt:#f0e6f7}
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -89,6 +92,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (max-width:600px){#counter{left:12px;transform:none}}
 @media (prefers-reduced-motion: reduce){.dg i{transition:none}}
 #library[hidden] ~ #counter{display:none}
+#counter.off{opacity:.55}
 
 /* 音樂播放器 */
 #music{position:fixed;right:12px;bottom:12px;z-index:10;width:230px;background:var(--paper);
@@ -97,15 +101,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 #music{transition:transform .25s}
 #music.away{transform:translateY(calc(100% + 24px));pointer-events:none}
 #plShow{position:fixed;right:12px;bottom:12px;z-index:10;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:1.25rem;box-shadow:0 8px 22px rgba(120,90,150,.25)}
-#auBox{aspect-ratio:16/9;border-radius:10px;background:var(--mint);display:grid;place-items:center;text-align:center;padding:8px;color:#2f4a3f;font-size:.85rem;line-height:1.6}
-@media (prefers-color-scheme: dark){#auBox{color:var(--ink)}}
+#auBox{aspect-ratio:16/9;border-radius:10px;background:var(--mint);display:grid;place-items:center;text-align:center;padding:8px;color:var(--bt);font-size:.85rem;line-height:1.6}
 #music button.on{background:var(--sage);color:#fff}
 #ytbox{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--mint)}
 #ytbox iframe{width:100%;height:100%;display:block}
 #music .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 #music input,#music textarea{flex:1;resize:none;min-width:0;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:transparent;color:var(--ink);font:inherit}
-#music button{border:1px solid var(--line);background:var(--mint);border-radius:8px;padding:2px 10px;color:#2f4a3f}
-@media (prefers-color-scheme: dark){#music button{color:var(--ink)}}
+#music button{border:1px solid var(--line);background:var(--mint);border-radius:8px;padding:2px 10px;color:var(--bt)}
 @media (max-width:600px){.sheet{padding:22px 20px}#music{width:170px}#music.mini{width:120px}}
 @media (prefers-reduced-motion: reduce){.book{transition:none}}
 </style>
@@ -116,11 +118,12 @@ button{font:inherit;color:inherit;cursor:pointer}
   <h1>Crib By EDaddy</h1>
   <p class="sub">想看就按，點兩側或用方向鍵翻頁。</p>
   <button class="chip" id="bmLib" style="margin-bottom:24px">書籤</button>
+  <button class="chip themeBtn" style="margin:0 0 24px 8px"></button>
   <div class="shelf" id="shelf"></div>
 </main>
 
 <section id="chapters" hidden>
-  <button class="chip" id="chBack">← 回去</button>
+  <button class="chip" id="chBack">← 回去</button> <button class="chip themeBtn"></button>
   <h1 id="chTitle"></h1>
   <p class="by" id="chBy"></p>
   <button class="chip" id="chCont">開始閱讀</button>
@@ -128,7 +131,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 </section>
 
 <section id="gallery" hidden>
-  <button class="chip" id="gBack">← 回去</button>
+  <button class="chip" id="gBack">← 回去</button> <button class="chip themeBtn"></button>
   <h1 id="gTitle"></h1>
   <p class="by" id="gBy"></p>
   <div id="gGrid"></div>
@@ -143,6 +146,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <button class="chip" id="bmList">書籤</button>
     <button class="chip" id="fsDown" aria-label="縮小字體">A−</button>
     <button class="chip" id="fsUp" aria-label="放大字體">A+</button>
+    <button class="chip themeBtn"></button>
   </div>
   <div class="stage">
     <button class="edge l" id="prev" aria-label="上一頁"></button>
@@ -177,7 +181,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 <button id="plShow" hidden aria-label="顯示音樂播放器" title="音樂播放器">🎵</button>
 <div id="lb" hidden><img id="lbImg" alt=""><p id="lbCap"></p></div>
-<div id="counter" role="status" hidden><span class="lbl">瀏覽次數</span><span class="odo" id="odo"></span></div>
+<div id="counter" role="status"><span class="lbl">瀏覽次數</span><span class="odo" id="odo"></span></div>
 
 <script>
 /* 書籍資料從 library.json 讀取，章節文字從 books/ 資料夾讀取 */
@@ -480,8 +484,13 @@ $('pToggle').onclick=()=>{
     else if(au.paused) playAudio(); else { au.pause(); wantPlay=false; }
   }catch(_){}
 };
-$('pNext').onclick=()=>{ try{ mode==='yt'?player.nextVideo():audioNext(1); }catch(_){} };
-$('pPrev').onclick=()=>{ try{ mode==='yt'?player.previousVideo():audioNext(-1); }catch(_){} };
+function ytStep(d){
+  const l=player.getPlaylist&&player.getPlaylist();
+  if(l&&l.length>1){ player.playVideoAt((player.getPlaylistIndex()+d+l.length)%l.length); }
+  else{ ytMsg('目前只載入到一首，請貼上播放清單或多支影片網址'); d>0?player.nextVideo():player.previousVideo(); }
+}
+$('pNext').onclick=()=>{ try{ mode==='yt'?ytStep(1):audioNext(1); }catch(_){} };
+$('pPrev').onclick=()=>{ try{ mode==='yt'?ytStep(-1):audioNext(-1); }catch(_){} };
 $('pShuf').onclick=()=>{
   shuf=!shuf; store.set('shuf',shuf); $('pShuf').classList.toggle('on',shuf);
   if(mode==='yt'){ try{ player.setShuffle(shuf); }catch(_){} }
@@ -503,14 +512,14 @@ function imgCandidates(src){
   if(/^https?:/i.test(src)) return [src];
   const base=src.split('/').pop(), dot=base.lastIndexOf('.');
   const name=dot>0?base.slice(0,dot):base, ext=dot>0?base.slice(dot):'';
-  const names=[base]; [ext.toLowerCase(),ext.toUpperCase()].forEach(e=>{ if(name+e!==base) names.push(name+e); });
+  const names=[base]; [ext.toLowerCase(),ext.toUpperCase(),'.png','.jpg','.jpeg','.webp'].forEach(e=>{ if(name+e!==base) names.push(name+e); });
   const out=[src];
   [src.slice(0,src.length-base.length),'images/mari/','images/',''].forEach(d=>names.forEach(n=>{ const q=d+n; if(!out.includes(q)) out.push(q); }));
   return out;
 }
 function loadImg(im,src,onFail){
   const list=imgCandidates(src); let i=0;
-  im.onerror=()=>{ i++; if(i<list.length) im.src=encodeURI(list[i]); else if(onFail) onFail(); };
+  im.onerror=()=>{ i++; if(i<list.length) im.src=encodeURI(list[i]); else if(onFail) onFail(list); };
   im.src=encodeURI(list[0]);
 }
 function openGallery(id){
@@ -527,10 +536,10 @@ function openGallery(id){
     const im=document.createElement('img'); im.alt=cap||g.title; im.decoding='async';
     f.appendChild(im);
     f.onclick=()=>{ $('lbImg').src=im.src; $('lbImg').alt=im.alt; $('lbCap').textContent=cap; $('lb').hidden=false; };
-    loadImg(im,src,()=>{
+    loadImg(im,src,list=>{
       f.textContent=''; f.onclick=null;
       const t=document.createElement('span'); t.className='miss';
-      t.textContent='找不到圖片：'+src+'（請確認 GitHub 上的資料夾、檔名、大小寫與 library.json 完全一致）';
+      t.style.whiteSpace='pre-wrap'; t.textContent='找不到圖片。library.json 設定的路徑：'+src+'\n實際嘗試的網址（共 '+list.length+' 個，列出前 3 個）：\n'+list.slice(0,3).map(u=>new URL(u,location.href).href).join('\n');
       f.appendChild(t);
     });
     box.appendChild(f);
@@ -559,15 +568,30 @@ odoSet(0);
     const ns=(location.hostname+'-'+seg).replace(/[^\w]+/g,'-').replace(/^-|-$/g,'')||'novel';
     const local=/^(localhost|127\.0\.0\.1|)$/.test(location.hostname)||location.protocol==='file:';
     const done=sessionStorage.getItem('counted');
-    const r=await fetch('https://api.counterapi.dev/v1/'+ns+'/visits'+(local||done?'':'/up'));
-    const j=await r.json(), n=j.count!=null?j.count:j.value;
+    const base='https://api.counterapi.dev/v1/'+ns+'/visits';
+    const hit=async u=>{ const r=await fetch(u); if(!r.ok) throw new Error(r.status); return r.json(); };
+    let j; try{ j=await hit(base+(local||done?'':'/up')); }catch(_){ j=await hit(base); }
+    const n=j.count!=null?j.count:j.value;
+    if(n==null) throw new Error('no count');
     if(!local) sessionStorage.setItem('counted','1');
-    if(n!=null){
-      $('counter').hidden=false; $('counter').setAttribute('aria-label','瀏覽次數 '+n);
-      setTimeout(()=>odoSet(n),80);
-    }
-  }catch(e){}
+    $('counter').setAttribute('aria-label','瀏覽次數 '+n);
+    setTimeout(()=>odoSet(n),80);
+  }catch(e){
+    console.warn('瀏覽次數讀取失敗',e);
+    $('counter').classList.add('off'); $('counter').querySelector('.lbl').textContent='瀏覽次數（暫時無法連線）';
+  }
 })();
+
+/* ============ 主題切換（自動／淺色／深色） ============ */
+const THEMES=['auto','light','dark'], TLABEL={auto:'🌓 自動',light:'☀️ 淺色',dark:'🌙 深色'};
+let theme=store.get('theme','auto'); if(!THEMES.includes(theme)) theme='auto';
+function applyTheme(){
+  const r=document.documentElement;
+  if(theme==='auto') r.removeAttribute('data-theme'); else r.dataset.theme=theme;
+  document.querySelectorAll('.themeBtn').forEach(b=>{ b.textContent=TLABEL[theme]; b.setAttribute('aria-label','切換主題，目前：'+TLABEL[theme]); });
+}
+document.querySelectorAll('.themeBtn').forEach(b=>b.onclick=()=>{ theme=THEMES[(THEMES.indexOf(theme)+1)%3]; store.set('theme',theme); applyTheme(); });
+applyTheme();
 
 /* ============ 啟動 ============ */
 (async()=>{
