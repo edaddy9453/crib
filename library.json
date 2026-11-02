@@ -5,10 +5,30 @@
       "title": "MaRi Go ARound",
       "blurb": "MaRi醬超級辣的捏～。",
       "chapters": [
-        { "title": "Chapter 1", "file": "books/MaRi Go ARound/chapter1.txt" },
-        { "title": "Chapter 2", "file": "books/MaRi Go ARound/chapter2.txt" },
-        { "title": "Chapter 3", "file": "books/MaRi Go ARound/chapter3.txt" },
-        { "title": "Chapter 4", "file": "books/MaRi Go ARound/chapter4.txt" }
+        {
+          "title": "Chapter 1",
+          "file": "books/MaRi Go ARound/chapter1.txt"
+        },
+        {
+          "title": "Chapter 2",
+          "file": "books/MaRi Go ARound/chapter2.txt"
+        },
+        {
+          "title": "Chapter 3",
+          "file": "books/MaRi Go ARound/chapter3.txt"
+        },
+        {
+          "title": "Chapter 4",
+          "file": "books/MaRi Go ARound/chapter4.txt"
+        },
+        {
+          "title": "Chapter 5",
+          "file": "books/MaRi Go ARound/chapter5.txt"
+        },
+        {
+          "title": "Chapter 6",
+          "file": "books/MaRi Go ARound/chapter6.txt"
+        }
       ]
     }
   ],
@@ -18,7 +38,10 @@
       "title": "MaRi醬",
       "blurb": "MaRi醬的形象圖片",
       "images": [
-        { "src": "images/mari/a02.png", "caption": "MaRi醬" }
+        {
+          "src": "images/mari/a02.png",
+          "caption": "MaRi醬"
+        }
       ]
     }
   ],
